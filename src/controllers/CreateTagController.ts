@@ -2,15 +2,18 @@ import { Request, Response } from "express";
 import { CreateTagService } from "../services/CreateTagService";
 
 class CreateTagController {
-  async handle(request: Request, response: Response) {
-    const { name } = request.body;
+    async handle(req: Request, res: Response) {
 
-    const createTagService = new CreateTagService();
+        const { name } = req.body;
 
-    const tag = await createTagService.execute(name);
+        const createTagService = new CreateTagService();
 
-    return response.json(tag);
-  }
+        const tag = await createTagService.execute({
+            name
+        });
+
+        return res.json(tag);
+    }
 }
 
-export { CreateTagController };
+export { CreateTagController }

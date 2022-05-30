@@ -1,37 +1,39 @@
-import { Request, Response, NextFunction } from "express";
-import { verify } from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express"
+import { verify } from "jsonwebtoken"
+import { promisify } from "util"
+
 
 interface IPayload {
-  sub: string;
+    sub: string
 }
 
-export function ensureAuthenticated(
-  request: Request,
-  response: Response,
-  next: NextFunction
+export async function ensureAuthenticated(
+    request: Request,
+    response: Response,
+    next: NextFunction
 ) {
-  // Receber o token
-  const authToken = request.headers.authorization;
+    const authToken = request.headers.authorization
 
-  // Validar se token está preenchido
-  if (!authToken) {
-    return response.status(401).end();
-  }
+    if(!authToken) {
+        return response.status(401).json({
+            error: 'Token not provided'
+        })
+    }
 
-  const [, token] = authToken.split(" ");
+    const [, token] = authToken.split(" ")
 
-  try {
-    // Validar se token é válido
-    const { sub } = verify(
-      token,
-      "4f93ac9d10cb751b8c9c646bc9dbccb9"
-    ) as IPayload;
+    try {
 
-    // Recuperar informações do usuário
-    request.user_id = sub;
+        // const decoded = await promisify(verify)(token, authConfig.secret)
+        // e5176b450ef2fc8c611b5f9924de65ce
 
-    return next();
-  } catch (err) {
-    return response.status(401).end();
-  }
+        // request.user_id = decoded.id
+
+        return next()
+
+    } catch (err) {
+        return response.status(401).json({
+            error: 'Token invalid'
+        })
+    }
 }
